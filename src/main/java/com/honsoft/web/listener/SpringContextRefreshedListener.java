@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.SingletonBeanRegistry;
@@ -22,11 +24,13 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Component
 public class SpringContextRefreshedListener implements ApplicationListener<ContextRefreshedEvent> {
+	private static Logger logger = LoggerFactory.getLogger(SpringContextRefreshedListener.class);
+	
 	private ApplicationContext context;
 	private HashSet<String> beansSet = new HashSet<>();
 	
 	 public void onApplicationEvent(ContextRefreshedEvent event) {
-		System.out.println("===================> Handling context re-freshed event. ");
+		logger.info("===================> Handling context re-freshed event. ");
 		
 		this.context = event.getApplicationContext();
 		
@@ -34,15 +38,15 @@ public class SpringContextRefreshedListener implements ApplicationListener<Conte
 		String[] beanNames = context.getBeanDefinitionNames();
 		beansSet.addAll(Arrays.asList(beanNames));
 
-		System.out.println("== list of beans (" + beanNames.length + ")==");
+		logger.info("== list of beans (" + beanNames.length + ")==");
 		for (String beanName : beanNames) {
-			System.out.println(cnt++ + " , " + beanName + " , " + context.getBean(beanName).getClass().toString());
+			logger.info(cnt++ + " , " + beanName + " , " + context.getBean(beanName).getClass().toString());
 		}
-		System.out.println("====================");
+		logger.info("====================");
 
 		cnt = 1;
 		String[] allBeans = printBeans();
-		System.out.println("=== all beans including beans registered by spring (" + allBeans.length + ")====");
+		logger.info("=== all beans including beans registered by spring (" + allBeans.length + ")====");
 
 		// List<String> singletonArrays = Arrays.asList(allBeans);
 
@@ -50,13 +54,13 @@ public class SpringContextRefreshedListener implements ApplicationListener<Conte
 			if (!beansSet.contains(bean))
 				// allBeans[singletonArrays.indexOf(bean)] = "manual "+singleton; // ignoring
 				// error handling
-				System.out.println(
+				logger.info(
 						cnt++ + " , <== manual ==> " + bean + " , " + context.getBean(bean).getClass().toString());
 			else
-				System.out.println(cnt++ + " , " + bean + " , " + context.getBean(bean).getClass().toString());
+				logger.info(cnt++ + " , " + bean + " , " + context.getBean(bean).getClass().toString());
 		}
 	        
-		System.out.println("====================== Handling context re-freshed event Ended. ====================== ");
+		logger.info("====================== Handling context re-freshed event Ended. ====================== ");
 	}
 	 
 
@@ -66,7 +70,7 @@ public class SpringContextRefreshedListener implements ApplicationListener<Conte
 			String[] singletonNames = ((SingletonBeanRegistry) autowireCapableBeanFactory).getSingletonNames();
 
 			for (String singleton : singletonNames) {
-				// System.out.println(singleton);
+				// logger.info(singleton);
 			}
 			return singletonNames;
 		}

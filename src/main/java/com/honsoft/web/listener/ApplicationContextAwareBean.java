@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.SingletonBeanRegistry;
@@ -14,7 +16,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ApplicationContextAwareBean implements ApplicationContextAware {
-
+	private static Logger logger = LoggerFactory.getLogger(ApplicationContextAwareBean.class);
+	
 	private ApplicationContext context;
 	private HashSet<String> beansSet = new HashSet<>();
 
@@ -25,15 +28,15 @@ public class ApplicationContextAwareBean implements ApplicationContextAware {
 		String[] beanNames = context.getBeanDefinitionNames();
 		beansSet.addAll(Arrays.asList(beanNames));
 
-		System.out.println("== list of beans (" + beanNames.length + ")==");
+		logger.info("== list of beans (" + beanNames.length + ")==");
 		for (String beanName : beanNames) {
-			System.out.println(cnt++ + " , " + beanName + " , " + context.getBean(beanName).getClass().toString());
+			logger.info(cnt++ + " , " + beanName + " , " + context.getBean(beanName).getClass().toString());
 		}
-		System.out.println("====================");
+		logger.info("====================");
 
 		cnt = 1;
 		String[] allBeans = printBeans();
-		System.out.println("=== all beans including beans registered by spring (" + allBeans.length + ")====");
+		logger.info("=== all beans including beans registered by spring (" + allBeans.length + ")====");
 
 		// List<String> singletonArrays = Arrays.asList(allBeans);
 
@@ -41,12 +44,12 @@ public class ApplicationContextAwareBean implements ApplicationContextAware {
 			if (!beansSet.contains(bean))
 				// allBeans[singletonArrays.indexOf(bean)] = "manual "+singleton; // ignoring
 				// error handling
-				System.out.println(
+				logger.info(
 						cnt++ + " , <== manual ==> " + bean + " , " + context.getBean(bean).getClass().toString());
 			else
-				System.out.println(cnt++ + " , " + bean + " , " + context.getBean(bean).getClass().toString());
+				logger.info(cnt++ + " , " + bean + " , " + context.getBean(bean).getClass().toString());
 		}
-		System.out.println("====================");
+		logger.info("====================");
 	}
 
 	private String[] printBeans() {
@@ -55,7 +58,7 @@ public class ApplicationContextAwareBean implements ApplicationContextAware {
 			String[] singletonNames = ((SingletonBeanRegistry) autowireCapableBeanFactory).getSingletonNames();
 
 			for (String singleton : singletonNames) {
-				// System.out.println(singleton);
+				// logger.info(singleton);
 			}
 			return singletonNames;
 		}
